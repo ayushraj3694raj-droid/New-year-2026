@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Happy Birthday!</title>
+    <style>
+        /* CSS Section */
+        body {
+            margin: 0;
+            padding: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            background: radial-gradient(circle, #ff9a9e 0%, #fecfef 100%);
+            font-family: 'Arial', sans-serif;
+            overflow: hidden;
+            text-align: center;
+        }
+
+        .card {
+            background: white;
+            padding: 30px;
+            border-radius: 20px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+            z-index: 10;
+            max-width: 400px;
+            animation: bounce 2s infinite;
+        }
+
+        @keyframes bounce {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-10px); }
+        }
+
+        .profile-img {
+            width: 150px;
+            height: 150px;
+            border-radius: 50%;
+            border: 5px solid #ff6b6b;
+            object-fit: cover;
+            margin-bottom: 20px;
+        }
+
+        h1 {
+            color: #ff4757;
+            margin: 10px 0;
+            font-size: 2.5rem;
+            text-shadow: 2px 2px #ffeaa7;
+        }
+
+        p {
+            color: #2f3542;
+            font-size: 1.2rem;
+        }
+
+        .btn {
+            background: #ff4757;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 25px;
+            cursor: pointer;
+            font-size: 1rem;
+            margin-top: 20px;
+            transition: 0.3s;
+        }
+
+        .btn:hover {
+            background: #e84118;
+            transform: scale(1.1);
+        }
+
+        /* Balloons CSS */
+        .balloon {
+            position: absolute;
+            width: 50px;
+            height: 70px;
+            background: rgba(255, 107, 107, 0.8);
+            border-radius: 50%;
+            bottom: -100px;
+            animation: float 5s linear infinite;
+        }
+
+        @keyframes float {
+            0% { transform: translateY(0) rotate(0deg); opacity: 1; }
+            100% { transform: translateY(-120vh) rotate(20deg); opacity: 0; }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="card">
+        <img src="" alt="Birthday Person" class="profile-img" id="birthdayImg">
+        <h1>Happy Birthday! 🎂</h1>
+        <p id="wish-text">Aapko janamdin ki bahut bahut shubhkamnayein! Bhagwan aapko hamesha khush rakhe.</p>
+        <button class="btn" onclick="startCelebration()">Surprise Click Karo!</button>
+    </div>
+
+    <script>
+        /* JavaScript Section */
+        function startCelebration() {
+            // Text change karne ke liye
+            document.getElementById('wish-text').innerHTML = "Party Sharty kab hai? 🥳✨";
+            
+            // Balloons banane ke liye
+            for (let i = 0; i < 30; i++) {
+                createBalloon();
+            }
+            
+            // Alert message
+            alert("Wishing you a wonderful year ahead! 🎉");
+        }
+
+        function createBalloon() {
+            const balloon = document.createElement('div');
+            balloon.className = 'balloon';
+            
+            // Random color aur position
+            const colors = ['#ff4757', '#2ed573', '#1e90ff', '#ffa502', '#eccc68'];
+            balloon.style.background = colors[Math.floor(Math.random() * colors.length)];
+            balloon.style.left = Math.random() * 100 + 'vw';
+            balloon.style.animationDuration = (Math.random() * 3 + 2) + 's';
+            
+            document.body.appendChild(balloon);
+            
+            // Memory saaf karne ke liye 5 sec baad balloon delete karein
+            setTimeout(() => {
+                balloon.remove();
+            }, 5000);
+        }
+    </script>
+
+</body>
+</html>
