@@ -1,0 +1,301 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Farewell 2026 | Memories</title>
+<link href="https://fonts.googleapis.com/css2?family=Dancing+Script:wght@700&family=Playfair+Display:wght@700&display=swap" rel="stylesheet">
+
+<style>
+    /* --- BASIC SETUP --- */
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body {
+        background: radial-gradient(circle, #2a0515, #000);
+        color: #ffb6c1;
+        font-family: 'Playfair Display', serif;
+        height: 100vh;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        overflow: hidden;
+    }
+
+    h1 { 
+        font-size: 1.6rem; 
+        margin-bottom: 15px; 
+        color: #ff69b4;
+        text-shadow: 0 0 10px #ff1493, 0 0 20px #ff1493;
+        z-index: 100;
+        text-align: center;
+    }
+
+    /* --- THE BOOK STACK --- */
+    .book-wrapper {
+        width: 100%;
+        display: flex;
+        justify-content: center;
+        perspective: 2000px;
+        transition: transform 0.8s ease;
+    }
+
+    .book-open { transform: translateX(130px); }
+
+    .book-scene { 
+        width: 260px; 
+        height: 380px; 
+        position: relative;
+        transform-style: preserve-3d;
+    }
+
+    @media (max-width: 600px) {
+        .book-scene { width: 210px; height: 320px; }
+        .book-open { transform: translateX(105px); }
+    }
+
+    /* --- INDIVIDUAL PAGES --- */
+    .page {
+        position: absolute;
+        width: 100%;
+        height: 100%;
+        top: 0; left: 0;
+        transform-origin: left;
+        transform-style: preserve-3d;
+        transition: transform 0.8s cubic-bezier(0.645, 0.045, 0.355, 1);
+        cursor: pointer;
+    }
+
+    .front, .back {
+        position: absolute;
+        width: 100%;
+        height: 100%;
+        backface-visibility: hidden;
+        border: 1.5px solid #ff1493;
+        border-radius: 4px 12px 12px 4px;
+        padding: 15px;
+        box-shadow: inset 0 0 25px rgba(255, 20, 147, 0.2);
+    }
+
+    .front { background: #000; z-index: 2; }
+    .back { 
+        background: #fffafa; 
+        color: #4a001f; 
+        transform: rotateY(-180deg); 
+    }
+
+    .page.flipped { transform: rotateY(-180deg); }
+
+    /* --- COVER PAGE STYLING --- */
+    .cover-content {
+        height: 100%;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+        text-align: center;
+        background: linear-gradient(45deg, #4a001f, #000, #4a001f);
+        border-radius: 4px 10px 10px 4px;
+    }
+
+    .institute-name {
+        font-size: 1.2rem;
+        color: #fff;
+        text-transform: uppercase;
+        letter-spacing: 2px;
+        margin-bottom: 10px;
+        text-shadow: 0 0 10px #ff1493;
+    }
+
+    .farewell-title {
+        font-family: 'Dancing Script', cursive;
+        font-size: 2.2rem;
+        color: #ff69b4;
+        margin: 15px 0;
+    }
+
+    /* --- PHOTO & TAPE STYLING --- */
+    .photo-container {
+        position: relative;
+        width: 100%;
+        height: 80%;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+    }
+
+    .photo-frame {
+        width: 100%;
+        height: 100%;
+        background: #fff;
+        padding: 6px 6px 20px 6px;
+        box-shadow: 0 8px 15px rgba(0,0,0,0.5);
+    }
+
+    .photo-frame img { width: 100%; height: 100%; object-fit: cover; }
+
+    /* Transparent Tape */
+    .photo-container::before, .photo-container::after {
+        content: "";
+        position: absolute;
+        width: 45px;
+        height: 18px;
+        background: rgba(255, 255, 255, 0.25);
+        backdrop-filter: blur(2px);
+        z-index: 10;
+    }
+    .photo-container::before { top: -5px; left: -10px; transform: rotate(-30deg); }
+    .photo-container::after { bottom: -5px; right: -10px; transform: rotate(-30deg); }
+
+    .caption {
+        text-align: center;
+        margin-top: 10px;
+        font-family: 'Dancing Script', cursive;
+        font-size: 1rem;
+        font-weight: bold;
+    }
+
+    /* --- CONTROLS --- */
+    .controls { margin-top: 25px; display: flex; gap: 12px; z-index: 100; }
+    button {
+        padding: 8px 18px;
+        background: transparent;
+        border: 2px solid #ff1493;
+        color: #ffb6c1;
+        border-radius: 20px;
+        cursor: pointer;
+        transition: 0.3s;
+    }
+    button:hover { background: #ff1493; color: white; }
+
+    .confetti { position: fixed; top: -20px; animation: fall linear forwards; z-index: 999; }
+    @keyframes fall { to { transform: translateY(110vh) rotate(720deg); opacity: 0; } }
+</style>
+</head>
+<body>
+
+<h1>✨ A Journey to Remember ✨</h1>
+
+<div class="book-wrapper" id="wrapper">
+    <div class="book-scene" id="book"></div>
+</div>
+
+<div class="controls">
+    <button onclick="toggleMusic()" id="musicBtn">🔇 Music</button>
+    <button onclick="resetBook()">↻ Reset</button>
+</div>
+
+<audio id="bgMusic" loop>
+    <source src="https://www.bensound.com/bensound-music/bensound-memories.mp3" type="audio/mpeg">
+</audio>
+
+<script>
+    const book = document.getElementById('book');
+    const wrapper = document.getElementById('wrapper');
+    const totalMemories = 38;
+    const totalPages = 20; // 1 cover page + 19 memory pages
+
+    // --- APNI PHOTOS KI LIST (38 Photos) ---
+    const myPhotos = [
+        "img1.jpg", "img2.jpg", "img3.jpg", "img4.jpg", "img5.jpg", "img6.jpg", 
+        "img7.jpg", "img8.jpg", "img9.jpg", "img10.jpg", "img11.jpg", "img12.jpg",
+        "img13.jpg", "img14.jpg", "img15.jpg", "img16.jpg", "img17.jpg", "img18.jpg",
+        "img19.jpg", "img20.jpg", "img21.jpg", "img22.jpg", "img23.jpg", "img24.jpg",
+        "img25.jpg", "img26.jpg", "img27.jpg", "img28.jpg", "img29.jpg", "img30.jpg",
+        "img31.jpg", "img32.jpg", "img33.jpg", "img34.jpg", "img35.jpg", "img36.jpg",
+        "img37.jpg", "img38.jpg"
+    ];
+
+    for (let i = 1; i <= totalPages; i++) {
+        const page = document.createElement('div');
+        page.className = 'page';
+        page.style.zIndex = totalPages - i;
+
+        if (i === 1) {
+            // --- FIRST PAGE: INSTITUTE COVER ---
+            page.innerHTML = `
+                <div class="front">
+                    <div class="cover-content">
+                        <div class="institute-name">Your Institute Name</div>
+                        <div style="color:#ffb6c1; font-size:0.7rem;">Presents</div>
+                        <div class="farewell-title">Farewell '26</div>
+                        <p style="font-size:0.8rem; letter-spacing:1px;">Batch of 2022-2026</p>
+                        <div style="margin-top:20px; font-size:1.2rem;">🌸 ✨ 🌸</div>
+                    </div>
+                </div>
+                <div class="back" style="display:flex; flex-direction:column; justify-content:center; align-items:center; padding:20px; text-align:center;">
+                    <h3 style="font-family:'Dancing Script'; font-size:1.8rem;">To Our Friends,</h3>
+                    <p style="margin-top:15px; font-size:0.9rem; line-height:1.6;">"Yaadein hi reh jati hain baaki sab khatam ho jata hai..."<br><br>Let's dive into our 38 beautiful memories.</p>
+                </div>`;
+        } else {
+            // --- MEMORY PAGES (Starting from Memory 1) ---
+            const memIndex = (i - 2) * 2;
+            const m1 = memIndex + 1;
+            const m2 = memIndex + 2;
+
+            const rotF = (Math.random() * 6 - 3).toFixed(2);
+            const rotB = (Math.random() * 6 - 3).toFixed(2);
+
+            const imgF = myPhotos[m1-1] ? myPhotos[m1-1] : `https://picsum.photos/id/${m1+10}/300/400`;
+            const imgB = myPhotos[m2-1] ? myPhotos[m2-1] : `https://picsum.photos/id/${m2+10}/300/400`;
+
+            page.innerHTML = `
+                <div class="front">
+                    <div class="photo-container" style="transform: rotate(${rotF}deg)">
+                        <div class="photo-frame"><img src="${imgF}"></div>
+                    </div>
+                    <div class="caption" style="color:#ff69b4;">Memory #${m1}</div>
+                </div>
+                <div class="back">
+                    <div class="photo-container" style="transform: rotate(${rotB}deg)">
+                        <div class="photo-frame"><img src="${imgB}"></div>
+                    </div>
+                    <div class="caption" style="color:#4a001f;">Memory #${m2}</div>
+                </div>`;
+        }
+
+        page.onclick = function() {
+            wrapper.classList.add('book-open');
+            if (!this.classList.contains('flipped')) {
+                this.classList.add('flipped');
+                setTimeout(() => { this.style.zIndex = i; }, 300);
+                createConfetti();
+            }
+        };
+        book.appendChild(page);
+    }
+
+    function resetBook() {
+        const allPages = document.querySelectorAll('.page');
+        wrapper.classList.remove('book-open');
+        Array.from(allPages).reverse().forEach((p, index) => {
+            setTimeout(() => {
+                p.classList.remove('flipped');
+                setTimeout(() => {
+                    allPages.forEach((pg, idx) => pg.style.zIndex = totalPages - idx);
+                }, 700);
+            }, index * 40); 
+        });
+    }
+
+    const audio = document.getElementById("bgMusic");
+    let isPlaying = false;
+    function toggleMusic() {
+        if (!isPlaying) { audio.play(); document.getElementById('musicBtn').innerText = "🎵 On"; }
+        else { audio.pause(); document.getElementById('musicBtn').innerText = "🔇 Off"; }
+        isPlaying = !isPlaying;
+    }
+
+    function createConfetti() {
+        for(let i=0; i<5; i++) {
+            const c = document.createElement("div");
+            c.className = "confetti";
+            c.innerText = ["🌸", "💖", "✨", "📷"][Math.floor(Math.random()*4)];
+            c.style.left = Math.random()*100+"vw";
+            c.style.animationDuration = (Math.random()*2+2)+"s";
+            document.body.appendChild(c);
+            setTimeout(() => c.remove(), 3000);
+        }
+    }
+</script>
+</body>
+</html>
