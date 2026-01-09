@@ -1,0 +1,194 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Farewell 2026 | WebBook</title>
+
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+
+<link href="https://fonts.googleapis.com/css2?family=Dancing+Script:wght@700&family=Playfair+Display:wght@700&display=swap" rel="stylesheet">
+
+<style>
+*{margin:0;padding:0;box-sizing:border-box;}
+body{
+    background:radial-gradient(circle,#2a0515,#000);
+    color:#ffb6c1;
+    font-family:'Playfair Display',serif;
+    height:100vh;
+    display:flex;
+    flex-direction:column;
+    align-items:center;
+    justify-content:center;
+    overflow:hidden;
+}
+
+h1{
+    font-size:1.6rem;
+    margin-bottom:15px;
+    color:#ff69b4;
+    text-shadow:0 0 12px #ff1493;
+}
+
+.book-wrapper{
+    width:100%;
+    display:flex;
+    justify-content:center;
+    perspective:900px;
+}
+
+.book-open{transform:translateX(110px);}
+
+.book-scene{
+    width:240px;
+    height:360px;
+    position:relative;
+    transform-style:preserve-3d;
+}
+
+.page{
+    position:absolute;
+    width:100%;
+    height:100%;
+    transform-origin:left;
+    transition:transform .8s ease;
+    transform-style:preserve-3d;
+}
+
+.front,.back{
+    position:absolute;
+    width:100%;
+    height:100%;
+    backface-visibility:hidden;
+    border-radius:6px;
+    padding:10px;
+    background:#000;
+    box-shadow:0 0 8px rgba(255,20,147,.5);
+}
+
+.back{
+    background:#fff;
+    color:#4a001f;
+    transform:rotateY(-180deg);
+}
+
+.page.flipped{transform:rotateY(-180deg);}
+
+.photo-frame{
+    width:100%;
+    height:100%;
+    border:2px solid #ff1493;
+    box-shadow:0 0 10px rgba(255,20,147,.5);
+}
+
+.photo-frame img{
+    width:100%;
+    height:100%;
+    object-fit:cover;
+}
+
+.controls{
+    margin-top:20px;
+    display:flex;
+    gap:15px;
+}
+
+button{
+    padding:8px 18px;
+    border-radius:20px;
+    border:2px solid #ff1493;
+    background:#000;
+    color:#ffb6c1;
+    font-weight:bold;
+}
+
+.confetti{
+    position:fixed;
+    top:-10px;
+    animation:fall linear forwards;
+}
+@keyframes fall{
+    to{transform:translateY(110vh) rotate(360deg);opacity:0;}
+}
+
+@media(max-width:600px){
+    h1{font-size:1.3rem;}
+    .front,.back{box-shadow:0 0 5px rgba(255,20,147,.4);}
+}
+</style>
+</head>
+<body>
+
+<h1>✨ Farewell WebBook ✨</h1>
+
+<div class="book-wrapper" id="wrapper">
+  <div class="book-scene" id="book"></div>
+</div>
+
+<div class="controls">
+  <button onclick="toggleMusic()">🎵 Music</button>
+  <button onclick="resetBook()">↻ Restart</button>
+</div>
+
+<audio id="bgMusic" loop>
+<source src="https://www.bensound.com/bensound-music/bensound-memories.mp3">
+</audio>
+
+<script>
+const photos=[
+"IMG-20260108-WA0096.jpg","IMG-20260108-WA0097.jpg",
+"IMG-20260108-WA0098.jpg","IMG-20260108-WA0100.jpg",
+"IMG-20260108-WA0102.jpg","IMG-20260108-WA0120.jpg",
+"IMG-20260108-WA0124.jpg","IMG-20260108-WA0129.jpg"
+];
+
+const book=document.getElementById("book");
+const pages=10;
+
+for(let i=0;i<pages;i++){
+  const p=document.createElement("div");
+  p.className="page";
+  p.style.zIndex=pages-i;
+
+  const img1=photos[i%photos.length];
+  const img2=photos[(i+1)%photos.length];
+
+  p.innerHTML=`
+  <div class="front"><div class="photo-frame"><img loading="lazy" src="${img1}"></div></div>
+  <div class="back"><div class="photo-frame"><img loading="lazy" src="${img2}"></div></div>
+  `;
+
+  p.onclick=()=>{
+    p.classList.add("flipped");
+    confetti();
+  };
+  book.appendChild(p);
+}
+
+function resetBook(){
+  document.querySelectorAll(".page").forEach(p=>p.classList.remove("flipped"));
+}
+
+const music=document.getElementById("bgMusic");
+let play=false;
+function toggleMusic(){
+  play?music.pause():music.play();
+  play=!play;
+}
+
+function confetti(){
+  for(let i=0;i<3;i++){
+    const c=document.createElement("div");
+    c.className="confetti";
+    c.innerText=["✨","💖","🎉"][Math.floor(Math.random()*3)];
+    c.style.left=Math.random()*100+"vw";
+    c.style.animationDuration="3s";
+    document.body.appendChild(c);
+    setTimeout(()=>c.remove(),3000);
+  }
+}
+</script>
+
+</body>
+</html>
